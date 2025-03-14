@@ -46,7 +46,9 @@ cd ../frontend && npm install
 ```
 
 Dans le dossier frontend/, exécute cette commande :
+```sh
 npm install -D tailwindcss postcss autoprefixer
+```
 
 ---
 
