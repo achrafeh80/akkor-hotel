@@ -60,7 +60,7 @@ router.post('/login', async (req, res) => {
     
     // Utiliser directement la méthode bcrypt.compare
 
-    const isMatch = await user.matchPassword(password);
+    const isMatch = user.password === password;
 
     
     if (!isMatch) {

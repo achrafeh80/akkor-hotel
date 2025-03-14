@@ -29,12 +29,12 @@ router.post('/', verifyToken, async (req, res) => {
 
   // Vérification des données
   if (!hotel || !checkInDate || !checkOutDate || !guests) {
-    console.log('❌ Erreur: Champs manquants', req.body);
+    console.log('Erreur: Champs manquants', req.body);
     return res.status(400).json({ message: 'Tous les champs sont obligatoires' });
   }
 
   try {
-    console.log('✅ Tentative de réservation avec:', req.body);
+    console.log('Tentative de réservation avec:', req.body);
 
     const newBooking = new Booking({
       user: req.user.id,
@@ -45,11 +45,11 @@ router.post('/', verifyToken, async (req, res) => {
     });
 
     await newBooking.save();
-    console.log('✅ Réservation créée:', newBooking);
+    console.log('Réservation créée:', newBooking);
 
     res.status(201).json(newBooking);
   } catch (err) {
-    console.error('❌ Erreur lors de la création de réservation:', err.message);
+    console.error('Erreur lors de la création de réservation:', err.message);
     res.status(500).json({ message: 'Erreur serveur', error: err.message });
   }
 });
@@ -69,7 +69,7 @@ router.put('/:id', verifyToken, async (req, res) => {
   }
 });
 
-// ❌ Supprimer une réservation
+//  Supprimer une réservation
 router.delete('/:id', verifyToken, async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id);

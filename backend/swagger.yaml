@@ -1,0 +1,276 @@
+openapi: 3.0.0
+info:
+  title: Akkor Hotel API
+  description: API permettant la gestion des utilisateurs, hôtels et réservations.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000/api
+    description: Serveur local de développement
+
+paths:
+  /auth/register:
+    post:
+      summary: Inscription d'un nouvel utilisateur
+      tags:
+        - Authentification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: Utilisateur créé avec succès
+        "400":
+          description: Erreur de validation ou utilisateur existant
+
+  /auth/login:
+    post:
+      summary: Connexion utilisateur
+      tags:
+        - Authentification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "test@example.com"
+                password:
+                  type: string
+                  example: "password123"
+      responses:
+        "200":
+          description: Connexion réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        "400":
+          description: Identifiants invalides
+
+  /users/me:
+    get:
+      summary: Récupérer son profil utilisateur
+      tags:
+        - Utilisateur
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Profil utilisateur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Non autorisé
+
+  /users/update:
+    put:
+      summary: Mettre à jour son profil
+      tags:
+        - Utilisateur
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "newemail@example.com"
+                pseudo:
+                  type: string
+                  example: "NewPseudo"
+      responses:
+        "200":
+          description: Profil mis à jour
+        "400":
+          description: Erreur de validation
+
+  /users/delete:
+    delete:
+      summary: Supprimer son compte
+      tags:
+        - Utilisateur
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Compte supprimé
+        "401":
+          description: Non autorisé
+
+  /hotels:
+    get:
+      summary: Liste tous les hôtels
+      tags:
+        - Hôtels
+      responses:
+        "200":
+          description: Liste des hôtels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Hotel"
+
+    post:
+      summary: Ajouter un hôtel (Admin seulement)
+      tags:
+        - Hôtels
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Hotel"
+      responses:
+        "201":
+          description: Hôtel ajouté avec succès
+        "403":
+          description: Accès interdit
+
+  /hotels/{id}:
+    get:
+      summary: Récupérer les détails d'un hôtel
+      tags:
+        - Hôtels
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de l'hôtel
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Détails de l'hôtel
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hotel"
+        "404":
+          description: Hôtel non trouvé
+
+  /bookings:
+    get:
+      summary: Liste des réservations de l'utilisateur connecté
+      tags:
+        - Réservations
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Liste des réservations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Booking"
+
+    post:
+      summary: Ajouter une réservation
+      tags:
+        - Réservations
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Booking"
+      responses:
+        "201":
+          description: Réservation ajoutée
+        "400":
+          description: Erreur de validation
+
+  /bookings/{id}:
+    get:
+      summary: Récupérer une réservation par ID
+      tags:
+        - Réservations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la réservation
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Détails de la réservation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "404":
+          description: Réservation non trouvée
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        email:
+          type: string
+        pseudo:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum: [user, admin, employee]
+
+    Hotel:
+      type: object
+      properties:
+        name:
+          type: string
+        location:
+          type: string
+        description:
+          type: string
+        picture_list:
+          type: array
+          items:
+            type: string
+
+    Booking:
+      type: object
+      properties:
+        user:
+          type: string
+        hotel:
+          type: string
+        checkInDate:
+          type: string
+          format: date
+        checkOutDate:
+          type: string
+          format: date
+        guests:
+          type: integer
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
