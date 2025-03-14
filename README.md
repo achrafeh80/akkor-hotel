@@ -45,6 +45,9 @@ cd backend && npm install
 cd ../frontend && npm install
 ```
 
+Dans le dossier frontend/, exécute cette commande :
+npm install -D tailwindcss postcss autoprefixer
+
 ---
 
 ## **📌 3️⃣ Démarrage du projet**
